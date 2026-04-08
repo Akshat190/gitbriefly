@@ -11,6 +11,7 @@ gitbrief scans your local repositories and tells you:
 - What you worked on yesterday
 - What might be broken
 - What you should do next
+- Commit statistics and history
 
 All in seconds.
 
@@ -45,8 +46,14 @@ Found 13 commits across 2 repositories
 
 ## 🚀 Install
 
+### From PyPI (recommended)
 ```bash
 pip install gitbrief
+```
+
+### From source
+```bash
+pip install -e .
 ```
 
 **Prerequisite:** [Ollama](https://ollama.ai) must be installed and running.
@@ -70,17 +77,43 @@ gitbrief week
 # Generate standup message (viral feature!)
 gitbrief standup
 
+# Commit statistics
+gitbrief stats
+gitbrief stats --days 30
+
+# View past summaries
+gitbrief history
+gitbrief history --days 14
+
 # Scan a specific repository
 gitbrief today --path /path/to/repo
 
 # Scan multiple repositories
 gitbrief week --path /path/to/repos
 
-# Use different Ollama model
+# Filter by author
+gitbrief today --author yourname
+
+# Filter by branch
+gitbrief today --branch main
+
+# Custom date range
+gitbrief today --since 2024-01-01 --until 2024-01-07
+
+# Use different AI model
 gitbrief today --model mistral
 
 # Use OpenAI instead of Ollama
 gitbrief today --provider openai --model gpt-3.5-turbo
+
+# Use Anthropic
+gitbrief today --provider anthropic --model claude-3-haiku-20240307
+
+# Stream AI response (Ollama only)
+gitbrief today --stream
+
+# Export to markdown file
+gitbrief today --export report.md
 
 # Export as JSON for scripting
 gitbrief today --json
@@ -92,15 +125,46 @@ gitbrief today --no-ai
 
 ---
 
+## ⚙️ Configuration
+
+Create `~/.gitbrief.toml` to set defaults:
+
+```toml
+path = "/path/to/repos"
+model = "llama3"
+provider = "ollama"
+```
+
+---
+
 ## 📁 Options
 
 | Option | Alias | Description | Default |
 |--------|-------|-------------|---------|
 | `--path` | `-p` | Path to Git repo or directory | `.` |
 | `--model` | `-m` | AI model to use | `llama3` |
-| `--provider` | - | AI provider: `ollama` or `openai` | `ollama` |
+| `--provider` | - | AI provider: `ollama`, `openai`, `anthropic` | `ollama` |
 | `--no-ai` | - | Skip AI, show raw commits | `false` |
 | `--json` | `-j` | Output as JSON | `false` |
+| `--stream` | - | Stream AI response (Ollama) | `false` |
+| `--export` | `-e` | Export to file | - |
+| `--since` | - | Start date (ISO or days) | - |
+| `--until` | - | End date (ISO) | - |
+| `--author` | - | Filter by author | - |
+| `--branch` | `-b` | Filter by branch | - |
+
+---
+
+## 🗂️ Commands
+
+| Command | Description |
+|--------|-------------|
+| `today` | Last 24 hours summary |
+| `week` | Last 7 days summary |
+| `standup` | Yesterday/Today/Blockers |
+| `stats` | Commit statistics |
+| `history` | Past summaries |
+| `version` | Show version |
 
 ---
 
@@ -121,11 +185,18 @@ gitbrief turns commits into insights.
 git clone https://github.com/Akshat190/gitbrief.git
 cd gitbrief
 
-# Install dependencies
-pip install -r requirements.txt
+# Install in development mode
+pip install -e .
 
-# Run locally
-python -m cli today --path .
+# Run tests
+pytest
+
+# Run linting
+ruff check gitbrief/
+
+# Run CLI
+python -m gitbrief.cli today --path .
+python -m gitbrief.cli stats
 ```
 
 ---
@@ -133,13 +204,6 @@ python -m cli today --path .
 ## 🤝 Contributing
 
 PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
-### Good First Issues
-
-- Add `--json` output flag for scripting
-- Improve error messages for Windows
-- Add `--since` and `--until` date filters
-- Add configuration file support
 
 ---
 

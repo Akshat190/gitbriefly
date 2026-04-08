@@ -1,6 +1,22 @@
 """Prompt templates for AI summarization."""
 
-from typing import List, Dict
+from typing import Dict, List
+
+
+JSON_PROMPT_SUFFIX = """
+
+IMPORTANT: Respond ONLY with a JSON object. No markdown. No preamble. Use this exact format:
+{"yesterday": ["item 1", "item 2"], "risks": ["item 1"], "next_steps": ["item 1"]}
+
+Do not include any other text in your response."""
+
+
+STANDUP_PROMPT_SUFFIX = """
+
+IMPORTANT: Respond ONLY with a JSON object. No markdown. No preamble. Use this exact format:
+{"yesterday": ["item 1", "item 2"], "today": ["item 1"], "blockers": ["item 1"]}
+
+Do not include any other text in your response."""
 
 
 def get_summarization_prompt(commits: List[Dict]) -> str:
@@ -28,19 +44,19 @@ Commits:
 
 Generate a briefing with these three sections:
 
-## 🧠 Yesterday
-Summarize the main work done. Group by theme/project. Use bullet points.
+## Yesterday
+List the main work done. Group by theme/project. Use bullet points.
 
-## ⚠️ Risks  
+## Risks  
 Identify potential issues:
 - Unfinished work (WIP commits, "todo" in messages)
 - Risky changes (large refactors, security-related)
 - Missing tests or error handling
 
-## 🎯 Next Steps
+## Next Steps
 Suggest logical next actions based on the commits.
 
-Be concise and actionable. Focus on what matters."""
+Be concise and actionable.{JSON_PROMPT_SUFFIX}"""
 
     return prompt
 
@@ -126,6 +142,6 @@ Generate a standup message in this exact format:
 
 For "Today", infer logical next steps from the commits.
 For "Blockers", identify any risks or unfinished work.
-Be concise - 3-5 items per section max."""
+Be concise - 3-5 items per section max.{STANDUP_PROMPT_SUFFIX}"""
 
     return prompt

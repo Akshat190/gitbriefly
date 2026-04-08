@@ -24,12 +24,12 @@ gitbrief is a CLI tool that analyzes your Git activity across repositories and g
 git clone https://github.com/Akshat190/gitbrief.git
 cd gitbrief
 
-# Install dependencies
-pip install -r requirements.txt
+# Install in development mode
+pip install -e .
 
 # Test the CLI
-python -m cli --help
-python -m cli today --path .
+python -m gitbrief.cli --help
+python -m gitbrief.cli today --path .
 ```
 
 ## 🛠️ Development Workflow
@@ -44,16 +44,23 @@ git checkout -b fix/bug-description
 
 ### 2. Make Your Changes
 
-- Follow existing code style
-- Add comments for complex logic
+- Follow existing code style (see Code Style below)
+- Add tests for new functionality
 - Keep functions small and focused
 
 ### 3. Test Your Changes
 
 ```bash
 # Test CLI commands
-python -m cli today --path . --no-ai
-python -m cli week --path . --no-ai
+python -m gitbrief.cli today --path . --no-ai
+python -m gitbrief.cli week --path . --no-ai
+python -m gitbrief.cli stats
+
+# Run linting
+ruff check gitbrief/
+
+# Run tests
+pytest
 ```
 
 ### 4. Submit a Pull Request
@@ -67,69 +74,69 @@ python -m cli week --path . --no-ai
 
 2. Open a Pull Request on GitHub
 
-3. Fill in the PR template:
-   - Description of changes
-   - Related issues
-   - Testing done
+3. Fill in the PR template
 
 ## 🎯 Good First Issues
 
 Looking for a way to contribute? Here are some beginner-friendly issues:
 
-### Good First Issues (Easy)
+### Easy
+- Add test cases for existing modules
+- Improve error messages
+- Add Windows compatibility fixes
 
-- **#1**: Add `--json` output flag
-  - Output results as JSON for scripting
-  
-- **#2**: Improve error messages
-  - Make error messages more user-friendly
-  
-- **#3**: Add Windows PowerShell support
-  - Fix compatibility issues on Windows
+### Intermediate
+- Implement new exporters (Slack, Notion)
+- Add more statistics to `stats` command
+- Improve AI prompts
 
-### Intermediate Issues
-
-- **#4**: Add `gitbrief replay` command
-  - Timeline narration of commits
-  
-- **#5**: Add `--since` and `--until` date filters
-  - Custom date range filtering
-
-- **#6**: Add configuration file support
-  - Store default paths and preferences
-
-### Advanced Issues
-
-- **#7**: Implement local caching
-  - Cache summaries to detect unfinished work
-  
-- **#8**: Add VS Code extension
-  - Integrate with VS Code
+### Advanced
+- Implement caching system
+- Add VS Code extension
 
 ## 📝 Code Style
 
 - Use **PEP 8** for Python code
-- Use type hints where possible
+- Run `ruff check gitbrief/` before submitting
 - Keep lines under 100 characters
+- Use type hints where possible
 - Use descriptive variable names
 
 ## 🧪 Testing
 
-Run tests before submitting:
+Tests are in the `tests/` directory. Run them with:
 
 ```bash
-# Test single repo
-python -m cli today --path /path/to/repo --no-ai
-
-# Test multi-repo
-python -m cli week --path /path/to/directory --no-ai
+pytest
 ```
 
-## 📖 Documentation
+## 📂 Package Structure
 
-- Update README.md for user-facing changes
-- Add docstrings for new functions
-- Update this file for developer-facing changes
+```
+gitbrief/
+├── __init__.py        (version)
+├── cli.py           (entry point)
+├── core/           (Git access)
+│   ├── git_reader.py
+│   ├── utils.py
+│   └── memory.py
+├── ai/             (AI layer)
+│   ├── summarizer.py
+│   ├── prompts.py
+│   └── providers/
+│       ├── ollama.py
+│       ├── openai.py
+│       └── anthropic.py
+├── commands/         (CLI commands)
+│   ├── today.py
+│   ├── week.py
+│   ├── standup.py
+│   ├── stats.py
+│   └── history.py
+└── exporters/       (output)
+    ├── markdown.py
+    └── json.py
+```
 
 ## 🤝 Code of Conduct
 
