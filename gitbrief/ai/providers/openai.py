@@ -8,7 +8,7 @@ from typing import Dict, List
 
 import requests
 
-from gitbrief.core.utils import load_config, get_config_value
+from gitbrief.core.utils import get_config_value
 
 
 class OpenAIProvider:

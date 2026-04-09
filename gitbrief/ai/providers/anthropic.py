@@ -6,7 +6,7 @@ import re
 import sys
 from typing import Dict, List
 
-from gitbrief.core.utils import load_config, get_config_value
+from gitbrief.core.utils import get_config_value
 
 try:
     from anthropic import Anthropic as AnthropicClient
@@ -23,7 +23,6 @@ class AnthropicProvider:
         self.model = model
         self.api_key = os.getenv("ANTHROPIC_API_KEY", "")
         self.timeout = timeout or get_config_value("timeout", 120)
-        config = load_config()
         self._validate_api_key()
         self.client = (
             AnthropicClient(api_key=self.api_key) if self.api_key and ANTHROPIC_AVAILABLE else None

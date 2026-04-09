@@ -8,7 +8,7 @@ from typing import Dict, List
 import requests
 
 from gitbrief.ai.prompts import get_summarization_prompt, get_standup_prompt
-from gitbrief.core.utils import load_config, get_config_value
+from gitbrief.core.utils import get_config_value
 
 
 class OllamaProvider:
@@ -24,7 +24,6 @@ class OllamaProvider:
         self.model = model
         self.base_url = base_url
         self.stream = stream
-        config = load_config()
         self.timeout = timeout or get_config_value("timeout", 120)
         self._check_connection()
         self._validate_model()
@@ -58,7 +57,7 @@ class OllamaProvider:
                     print(f"[dim]Using first available: {available[0]}[/dim]", file=sys.stderr)
                     self.model = available[0]
                 else:
-                    raise RuntimeError(f"No models available. Pull one with: ollama pull <model>")
+                    raise RuntimeError("No models available. Pull one with: ollama pull <model>")
         except RuntimeError:
             raise
         except Exception as e:
@@ -212,7 +211,7 @@ class OllamaProvider:
     def _fallback_summary(self, commits: List[Dict], error: str) -> Dict[str, List[str]]:
         """Fallback when Ollama is unavailable."""
         print(
-            f"[yellow]Warning: AI response parsing failed - showing basic summary[/yellow]",
+            "[yellow]Warning: AI response parsing failed - showing basic summary[/yellow]",
             file=sys.stderr,
         )
         repo_groups = {}

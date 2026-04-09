@@ -1,7 +1,6 @@
 """Doctor command - diagnostic tool."""
 
 import os
-import sys
 from pathlib import Path
 
 import requests
@@ -104,12 +103,12 @@ def doctor_command(path: str = None):
     ollama_running, models = check_ollama_running()
     if ollama_running:
         model_names = [m.get("name", "") for m in models]
-        console.print(f"  [green]✓[/green] Ollama is running")
+        console.print("  [green]✓[/green] Ollama is running")
         console.print(f"  Available models: {', '.join(model_names) if model_names else 'None'}")
         results.append(("Ollama", "Running", "green"))
     else:
-        console.print(f"  [red]✗[/red] Ollama is not running")
-        console.print(f"  [dim]Fix: Run 'ollama serve' in a terminal[/dim]")
+        console.print("  [red]✗[/red] Ollama is not running")
+        console.print("  [dim]Fix: Run 'ollama serve' in a terminal[/dim]")
         results.append(("Ollama", "Not running", "red"))
 
     console.print("\n[bold]2. Checking Git repository...[/bold]")
@@ -129,8 +128,8 @@ def doctor_command(path: str = None):
             console.print(f"  [green]✓[/green] {count} commits in last 7 days")
             results.append(("Commits (7d)", str(count), "green"))
         else:
-            console.print(f"  [yellow]⚠[/yellow] No commits in last 7 days")
-            console.print(f"  [dim]Tip: Try --since 2026-03-01[/dim]")
+            console.print("  [yellow]⚠[/yellow] No commits in last 7 days")
+            console.print("  [dim]Tip: Try --since 2026-03-01[/dim]")
             results.append(("Commits (7d)", "0", "yellow"))
 
     console.print("\n[bold]4. Checking config file...[/bold]")
@@ -140,7 +139,7 @@ def doctor_command(path: str = None):
             console.print(f"  [green]✓[/green] Config file: {config_data}")
             results.append(("Config", config_data, "green"))
         else:
-            console.print(f"  [green]✓[/green] Config file valid")
+            console.print("  [green]✓[/green] Config file valid")
             results.append(("Config", "Valid", "green"))
     else:
         console.print(f"  [red]✗[/red] Config error: {config_data}")

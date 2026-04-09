@@ -24,7 +24,7 @@ def load_config() -> dict:
             return {}
         except Exception as e:
             print(f"[yellow]Warning: Config file error: {e}[/yellow]", file=sys.stderr)
-            print(f"[dim]Check ~/.gitbrief.toml for syntax errors[/dim]", file=sys.stderr)
+            print("[dim]Check ~/.gitbrief.toml for syntax errors[/dim]", file=sys.stderr)
             return {}
     return {}
 
