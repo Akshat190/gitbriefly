@@ -19,12 +19,6 @@ You open Git, scroll commits, and still feel unsure.
 
 ---
 
-## 🚀 The Solution
-
-gitbrief turns your Git history into a clean standup in seconds.
-
-```bash
-gitbrief standup
 ## ⚡ Quick Demo
 
 ```bash
