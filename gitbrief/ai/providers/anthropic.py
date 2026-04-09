@@ -3,7 +3,10 @@
 import json
 import os
 import re
+import sys
 from typing import Dict, List
+
+from gitbrief.core.utils import load_config, get_config_value
 
 try:
     from anthropic import Anthropic as AnthropicClient
@@ -16,12 +19,29 @@ except ImportError:
 class AnthropicProvider:
     """AI provider using Anthropic API."""
 
-    def __init__(self, model: str = "claude-3-haiku-20240307"):
+    def __init__(self, model: str = "claude-3-haiku-20240307", timeout: int = None):
         self.model = model
         self.api_key = os.getenv("ANTHROPIC_API_KEY", "")
+        self.timeout = timeout or get_config_value("timeout", 120)
+        config = load_config()
+        self._validate_api_key()
         self.client = (
             AnthropicClient(api_key=self.api_key) if self.api_key and ANTHROPIC_AVAILABLE else None
         )
+
+    def _validate_api_key(self):
+        """Validate that API key is set."""
+        if not self.api_key:
+            print(
+                "[red]Error: Anthropic provider selected but ANTHROPIC_API_KEY not set[/red]",
+                file=sys.stderr,
+            )
+            print("[dim]Fix: export ANTHROPIC_API_KEY=your-key[/dim]", file=sys.stderr)
+            raise ValueError("ANTHROPIC_API_KEY not set")
+        if not ANTHROPIC_AVAILABLE:
+            print("[red]Error: Anthropic package not installed[/red]", file=sys.stderr)
+            print("[dim]Fix: pip install anthropic[/dim]", file=sys.stderr)
+            raise ImportError("Anthropic package not installed. Run: pip install anthropic")
 
     @property
     def name(self) -> str:

@@ -9,16 +9,23 @@ def load_config() -> dict:
     """Load config from ~/.gitbrief.toml."""
     config_path = Path.home() / ".gitbrief.toml"
     if config_path.exists():
-        if sys.version_info >= (3, 11):
-            import tomllib
+        try:
+            if sys.version_info >= (3, 11):
+                import tomllib
 
-            with open(config_path, "rb") as f:
-                return tomllib.load(f)
-        else:
-            import tomli
+                with open(config_path, "rb") as f:
+                    return tomllib.load(f)
+            else:
+                import tomli
 
-            with open(config_path, "rb") as f:
-                return tomli.load(f)
+                with open(config_path, "rb") as f:
+                    return tomli.load(f)
+        except ImportError:
+            return {}
+        except Exception as e:
+            print(f"[yellow]Warning: Config file error: {e}[/yellow]", file=sys.stderr)
+            print(f"[dim]Check ~/.gitbrief.toml for syntax errors[/dim]", file=sys.stderr)
+            return {}
     return {}
 
 

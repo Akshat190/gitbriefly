@@ -1,12 +1,14 @@
 """CLI entry point for gitbrief."""
 
 import typer
+from typing import Optional
 
 from gitbrief.commands.today import today_command
 from gitbrief.commands.week import week_command
 from gitbrief.commands.standup import standup_command
 from gitbrief.commands.stats import stats_command
 from gitbrief.commands.history import history_command
+from gitbrief.commands.doctor import doctor_command
 
 app = typer.Typer(
     name="gitbrief",
@@ -17,19 +19,21 @@ app = typer.Typer(
 
 @app.command()
 def today(
-    path=None,
-    model=None,
-    provider=None,
-    no_ai=False,
-    json_output=False,
-    stream=False,
-    export=None,
-    since=None,
-    until=None,
-    author=None,
-    branch=None,
+    path: Optional[str] = None,
+    model: Optional[str] = None,
+    provider: Optional[str] = None,
+    no_ai: bool = False,
+    json_output: bool = False,
+    stream: bool = False,
+    export: Optional[str] = None,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+    days_ago: Optional[int] = typer.Option(7, "--days-ago", help="Number of days to look back"),
+    max_commits: int = 100,
+    author: Optional[str] = None,
+    branch: Optional[str] = None,
 ):
-    """Show summary of Git activity from the last 24 hours."""
+    """Show summary of Git activity from the last 7 days."""
     today_command(
         path=path,
         model=model,
@@ -40,6 +44,8 @@ def today(
         export=export,
         since=since,
         until=until,
+        days=days_ago,
+        max_commits=max_commits,
         author=author,
         branch=branch,
     )
@@ -47,17 +53,19 @@ def today(
 
 @app.command()
 def week(
-    path=None,
-    model=None,
-    provider=None,
-    no_ai=False,
-    json_output=False,
-    stream=False,
-    export=None,
-    since=None,
-    until=None,
-    author=None,
-    branch=None,
+    path: Optional[str] = None,
+    model: Optional[str] = None,
+    provider: Optional[str] = None,
+    no_ai: bool = False,
+    json_output: bool = False,
+    stream: bool = False,
+    export: Optional[str] = None,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+    days_ago: int = 7,
+    max_commits: int = 100,
+    author: Optional[str] = None,
+    branch: Optional[str] = None,
 ):
     """Show summary of Git activity from the last 7 days."""
     week_command(
@@ -70,6 +78,8 @@ def week(
         export=export,
         since=since,
         until=until,
+        days=days_ago,
+        max_commits=max_commits,
         author=author,
         branch=branch,
     )
@@ -77,17 +87,19 @@ def week(
 
 @app.command()
 def standup(
-    path=None,
-    model=None,
-    provider=None,
-    no_ai=False,
-    json_output=False,
-    stream=False,
-    export=None,
-    since=None,
-    until=None,
-    author=None,
-    branch=None,
+    path: Optional[str] = None,
+    model: Optional[str] = None,
+    provider: Optional[str] = None,
+    no_ai: bool = False,
+    json_output: bool = False,
+    stream: bool = False,
+    export: Optional[str] = None,
+    since: Optional[str] = None,
+    until: Optional[str] = None,
+    days_ago: int = 7,
+    max_commits: int = 100,
+    author: Optional[str] = None,
+    branch: Optional[str] = None,
 ):
     """Generate a ready-to-paste standup message (Yesterday / Today / Blockers)."""
     standup_command(
@@ -100,6 +112,8 @@ def standup(
         export=export,
         since=since,
         until=until,
+        days=days_ago,
+        max_commits=max_commits,
         author=author,
         branch=branch,
     )
@@ -122,6 +136,14 @@ def history(
 ):
     """Show past summaries from memory."""
     history_command(days=days, json_output=json_output)
+
+
+@app.command()
+def doctor(
+    path: Optional[str] = None,
+):
+    """Run diagnostics to check for common issues."""
+    doctor_command(path=path)
 
 
 @app.command()

@@ -33,6 +33,8 @@ def week_command(
     until: Optional[str] = None,
     author: Optional[str] = None,
     branch: Optional[str] = None,
+    days: int = 7,
+    max_commits: int = 100,
 ):
     """Show summary of Git activity from the last 7 days."""
     path = _resolve_arg(path, "path", ".")
@@ -44,10 +46,13 @@ def week_command(
     )
 
     reader = GitReader(str(path))
-    commits = reader.get_commits(days=7, since=since, until=until, author=author, branch=branch)
+    commits = reader.get_commits(
+        days=days, since=since, until=until, author=author, branch=branch, max_count=max_commits
+    )
 
     if not commits:
         console.print("[yellow]No commits found in the specified time range.[/yellow]")
+        console.print("[dim]Tip: Try --since 2026-03-01 or a wider date range[/dim]")
         raise typer.Exit(0)
 
     console.print(

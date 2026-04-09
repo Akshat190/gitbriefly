@@ -16,11 +16,12 @@ class GitReader:
 
     def get_commits(
         self,
-        days: int = 1,
+        days: int = 7,
         since: Optional[str] = None,
         until: Optional[str] = None,
         author: Optional[str] = None,
         branch: Optional[str] = None,
+        max_count: int = 100,
     ) -> List[Dict]:
         """Get commits from the last N days or within a date range."""
         self.commits = []
@@ -45,6 +46,7 @@ class GitReader:
 
         self.author_filter = author
         self.branch_filter = branch
+        self.max_count = max_count
 
         if self._is_git_repo(self.path):
             self.repos.append(str(self.path))
@@ -84,7 +86,7 @@ class GitReader:
 
             branch = self.branch_filter if self.branch_filter else "HEAD"
 
-            for commit in repo.iter_commits(branch, all=True, max_count=100):
+            for commit in repo.iter_commits(branch, all=True, max_count=self.max_count):
                 commit_time = commit.committed_datetime.replace(tzinfo=None)
 
                 if not (self.since <= commit_time <= self.until):

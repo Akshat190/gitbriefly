@@ -32,6 +32,8 @@ def standup_command(
     until: Optional[str] = None,
     author: Optional[str] = None,
     branch: Optional[str] = None,
+    days: int = 7,
+    max_commits: int = 100,
 ):
     """Generate a ready-to-paste standup message (Yesterday / Today / Blockers)."""
     path = _resolve_arg(path, "path", ".")
@@ -39,7 +41,9 @@ def standup_command(
     provider = _resolve_arg(provider, "provider", "ollama")
 
     reader = GitReader(str(path))
-    commits = reader.get_commits(days=1, since=since, until=until, author=author, branch=branch)
+    commits = reader.get_commits(
+        days=days, since=since, until=until, author=author, branch=branch, max_count=max_commits
+    )
 
     if not commits:
         if json_output:

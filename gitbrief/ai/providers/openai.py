@@ -3,17 +3,32 @@
 import json
 import os
 import re
+import sys
 from typing import Dict, List
 
 import requests
+
+from gitbrief.core.utils import load_config, get_config_value
 
 
 class OpenAIProvider:
     """AI provider using OpenAI API."""
 
-    def __init__(self, model: str = "gpt-3.5-turbo"):
+    def __init__(self, model: str = "gpt-3.5-turbo", timeout: int = None):
         self.model = model
         self.api_key = os.getenv("OPENAI_API_KEY", "")
+        self.timeout = timeout or get_config_value("timeout", 120)
+        self._validate_api_key()
+
+    def _validate_api_key(self):
+        """Validate that API key is set."""
+        if not self.api_key:
+            print(
+                "[red]Error: OpenAI provider selected but OPENAI_API_KEY not set[/red]",
+                file=sys.stderr,
+            )
+            print("[dim]Fix: export OPENAI_API_KEY=your-key[/dim]", file=sys.stderr)
+            raise ValueError("OPENAI_API_KEY not set")
 
     @property
     def name(self) -> str:
@@ -29,7 +44,7 @@ class OpenAIProvider:
             "temperature": 0.7,
         }
 
-        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        response = requests.post(url, json=payload, headers=headers, timeout=self.timeout)
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"]
 
