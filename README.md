@@ -21,7 +21,7 @@ You open Git, scroll commits, and still feel unsure.
 
 ## ⚡ Quick Demo
 
-<img src="https://raw.githubusercontent.com/Akshat190/gitbriefly/main/assets/gitbriefly-gif.gif" width="600" alt="gitbriefly demo"/>
+<img src="https://raw.githubusercontent.com/Akshat190/gitbriefly/main/assets/gitbriefly.gif" width="600" alt="gitbriefly demo"/>
 
 ```bash
 $ pip install gitbriefly
