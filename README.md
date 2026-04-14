@@ -1,9 +1,9 @@
-# commitpilot 🧠
+# gitbriefly 🧠
 
-[![PyPI version](https://img.shields.io/pypi/v/commitpilot)](https://pypi.org/project/commitpilot/)
+[![PyPI version](https://img.shields.io/pypi/v/gitbriefly)](https://pypi.org/project/gitbriefly/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/Akshat190/commitpilot?style=social)](https://github.com/Akshat190/commitpilot)
+[![GitHub Stars](https://img.shields.io/github/stars/Akshat190/gitbriefly?style=social)](https://github.com/Akshat190/gitbriefly)
 
 Your daily developer standup — powered by your Git history.
 
@@ -21,11 +21,11 @@ You open Git, scroll commits, and still feel unsure.
 
 ## ⚡ Quick Demo
 
-<img src="assets/commitpilot-gif.gif" width="600" alt="commitpilot demo"/>
+<img src="https://raw.githubusercontent.com/Akshat190/gitbriefly/main/assets/gitbriefly-gif.gif" width="600" alt="gitbriefly demo"/>
 
 ```bash
-$ pip install commitpilot
-$ commitpilot standup
+$ pip install gitbriefly
+$ gitbriefly standup
 **Yesterday:**
 - Enhanced AI output quality
 - Added deduplication and truncation
@@ -45,17 +45,17 @@ $ commitpilot standup
 
 ### From PyPI (recommended)
 ```bash
-pip install commitpilot
+pip install gitbriefly
 ```
 
 ### With OpenAI support
 ```bash
-pip install commitpilot[openai]
+pip install gitbriefly[openai]
 ```
 
 ### With Anthropic support
 ```bash
-pip install commitpilot[anthropic]
+pip install gitbriefly[anthropic]
 ```
 
 ### From source
@@ -76,74 +76,74 @@ ollama pull llama3
 
 ```bash
 # Today's summary (last 7 days)
-commitpilot today
+gitbriefly today
 
 # Weekly summary (last 7 days)
-commitpilot week
+gitbriefly week
 
 # Generate standup message (viral feature!)
-commitpilot standup
+gitbriefly standup
 
 # Diagnose issues
-commitpilot doctor
+gitbriefly doctor
 
 # Commit statistics
-commitpilot stats
-commitpilot stats --days 30
+gitbriefly stats
+gitbriefly stats --days 30
 
 # View past summaries
-commitpilot history
-commitpilot history --days 14
+gitbriefly history
+gitbriefly history --days 14
 
 # Scan a specific repository
-commitpilot today --path /path/to/repo
+gitbriefly today --path /path/to/repo
 
 # Scan multiple repositories
-commitpilot week --path /path/to/repos
+gitbriefly week --path /path/to/repos
 
 # Filter by author
-commitpilot today --author yourname
+gitbriefly today --author yourname
 
 # Filter by branch
-commitpilot today --branch main
+gitbriefly today --branch main
 
 # Custom date range
-commitpilot today --since 2024-01-01 --until 2024-01-07
+gitbriefly today --since 2024-01-01 --until 2024-01-07
 
 # Days to look back (default: 7)
-commitpilot today --days-ago 14
+gitbriefly today --days-ago 14
 
 # Limit commits processed
-commitpilot today --max-commits 50
+gitbriefly today --max-commits 50
 
 # Use different AI model
-commitpilot today --model mistral
+gitbriefly today --model mistral
 
 # Use OpenAI instead of Ollama
-commitpilot today --provider openai --model gpt-3.5-turbo
+gitbriefly today --provider openai --model gpt-3.5-turbo
 
 # Use Anthropic
-commitpilot today --provider anthropic --model claude-3-haiku-20240307
+gitbriefly today --provider anthropic --model claude-3-haiku-20240307
 
 # Stream AI response (Ollama only)
-commitpilot today --stream
+gitbriefly today --stream
 
 # Export to markdown file
-commitpilot today --export report.md
+gitbriefly today --export report.md
 
 # Export as JSON for scripting
-commitpilot today --json
-commitpilot standup --json
+gitbriefly today --json
+gitbriefly standup --json
 
 # Show raw commits without AI
-commitpilot today --no-ai
+gitbriefly today --no-ai
 ```
 
 ---
 
 ## ⚙️ Configuration
 
-Create `~/.commitpilot.toml` to set defaults:
+Create `~/.gitbriefly.toml` to set defaults:
 
 ```toml
 path = "/path/to/repos"
@@ -192,9 +192,9 @@ timeout = 120
 
 Developers forget context. Git stores history but not understanding.
 
-commitpilot turns commits into insights.
+gitbriefly turns commits into insights.
 
-> "I built this because I kept forgetting what I worked on the day before. Now I just run `commitpilot` and know exactly what to continue working on."
+> "I built this because I kept forgetting what I worked on the day before. Now I just run `gitbriefly` and know exactly what to continue working on."
 
 ---
 
@@ -202,8 +202,8 @@ commitpilot turns commits into insights.
 
 ```bash
 # Clone the repo
-git clone https://github.com/Akshat190/commitpilot.git
-cd commitpilot
+git clone https://github.com/Akshat190/gitbriefly.git
+cd gitbriefly
 
 # Install in development mode
 pip install -e .
@@ -212,11 +212,11 @@ pip install -e .
 pytest
 
 # Run linting
-ruff check commitpilot/
+ruff check gitbriefly/
 
 # Run CLI
-python -m commitpilot.cli today --path .
-python -m commitpilot.cli stats
+python -m gitbriefly.cli today --path .
+python -m gitbriefly.cli stats
 ```
 
 ---
@@ -235,7 +235,7 @@ MIT License - see [LICENSE](LICENSE)
 
 ## ⭐ Star this repo if it saved you time
 
-[![GitHub Stars](https://img.shields.io/github/stars/Akshat190/commitpilot?style=social)](https://github.com/Akshat190/commitpilot)
+[![GitHub Stars](https://img.shields.io/github/stars/Akshat190/gitbriefly?style=social)](https://github.com/Akshat190/gitbriefly)
 
 ---
 

@@ -1,4 +1,4 @@
-"""Utility functions for gitbrief."""
+"""Utility functions for gitbriefly."""
 
 import sys
 from datetime import datetime, timedelta
@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 def load_config() -> dict:
-    """Load config from ~/.gitbrief.toml."""
-    config_path = Path.home() / ".gitbrief.toml"
+    """Load config from ~/.gitbriefly.toml."""
+    config_path = Path.home() / ".gitbriefly.toml"
     if config_path.exists():
         try:
             if sys.version_info >= (3, 11):
@@ -24,7 +24,7 @@ def load_config() -> dict:
             return {}
         except Exception as e:
             print(f"[yellow]Warning: Config file error: {e}[/yellow]", file=sys.stderr)
-            print("[dim]Check ~/.gitbrief.toml for syntax errors[/dim]", file=sys.stderr)
+            print("[dim]Check ~/.gitbriefly.toml for syntax errors[/dim]", file=sys.stderr)
             return {}
     return {}
 
@@ -63,3 +63,6 @@ def group_by_repo(commits: list) -> dict:
             result[repo] = []
         result[repo].append(commit)
     return result
+
+
+

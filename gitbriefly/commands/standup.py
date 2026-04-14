@@ -5,10 +5,10 @@ import json
 from rich.console import Console
 from typing import Optional
 
-from commitpilot.core.git_reader import GitReader
-from commitpilot.ai import Summarizer
-from commitpilot.core.utils import load_config, get_config_value
-from commitpilot.exporters import get_exporter
+from gitbrieflyly.core.git_reader import GitReader
+from gitbrieflyly.ai import Summarizer
+from gitbrieflyly.core.utils import load_config, get_config_value
+from gitbrieflyly.exporters import get_exporter
 
 console = Console()
 config = load_config()
@@ -117,3 +117,6 @@ def _export_output(path: str, summary: dict):
     exporter = get_exporter("markdown")
     exporter.export(summary, path)
     console.print(f"[green]Exported to {path}[/green]")
+
+
+

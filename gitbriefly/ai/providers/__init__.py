@@ -3,9 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
-from commitpilot.ai.providers.ollama import OllamaProvider
-from commitpilot.ai.providers.openai import OpenAIProvider
-from commitpilot.ai.providers.anthropic import AnthropicProvider
+from gitbrieflyly.ai.providers.ollama import OllamaProvider
+from gitbrieflyly.ai.providers.openai import OpenAIProvider
+from gitbrieflyly.ai.providers.anthropic import AnthropicProvider
 
 
 class BaseProvider(ABC):
@@ -45,3 +45,6 @@ def get_provider(provider: str, model: str = "llama3", **kwargs):
 
 
 __all__ = ["BaseProvider", "get_provider", "OllamaProvider", "OpenAIProvider", "AnthropicProvider"]
+
+
+

@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.table import Table
 from datetime import datetime
 
-from commitpilot.core.memory import get_history
+from gitbrieflyly.core.memory import get_history
 
 console = Console()
 
@@ -52,3 +52,6 @@ def _display_history(history, days):
         table.add_row(date_str, str(commits), summary_text)
 
     console.print(table)
+
+
+

@@ -1,4 +1,4 @@
-"""Memory storage for gitbrief."""
+"""Memory storage for gitbriefly."""
 
 import json
 from datetime import datetime
@@ -40,3 +40,6 @@ def get_history(days: int = 7) -> List[Dict]:
     """Get summaries from the last N days."""
     memory = load_memory()
     return memory[-days:] if memory else []
+
+
+

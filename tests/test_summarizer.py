@@ -2,7 +2,7 @@
 
 import pytest
 
-from commitpilot.ai.summarizer import Summarizer
+from gitbriefly.ai.summarizer import Summarizer
 
 
 def test_summarize_empty_commits():
@@ -47,7 +47,13 @@ def test_summarizer_fallback_on_no_ai():
     """Test that fallback works when no AI available."""
     s = Summarizer(provider="nonexistent")
     commits = [
-        {"repo": "test", "message": "test commit", "files": [], "insertions": 5, "deletions": 2}
+        {
+            "repo": "test",
+            "message": "test commit",
+            "files": [],
+            "insertions": 5,
+            "deletions": 2,
+        }
     ]
     result = s.summarize(commits)
     assert isinstance(result, dict)

@@ -61,9 +61,9 @@ def check_commits_in_range(path, days=7):
 
 def check_config_file():
     """Check if config file is valid."""
-    from commitpilot.core.utils import load_config
+    from gitbrieflyly.core.utils import load_config
 
-    config_path = Path.home() / ".gitbrief.toml"
+    config_path = Path.home() / ".gitbriefly.toml"
     if not config_path.exists():
         return True, "No config file (optional)"
 
@@ -176,3 +176,6 @@ def doctor_command(path: str = None):
         console.print("\n[bold yellow]Some issues found. See suggestions above.[/bold yellow]\n")
 
     raise typer.Exit(0)
+
+
+

@@ -1,5 +1,7 @@
 include README.md
 include pyproject.toml
-recursive-include commitpilot *.py
+include LICENSE
+recursive-include gitbriefly *.py
+recursive-include assets *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

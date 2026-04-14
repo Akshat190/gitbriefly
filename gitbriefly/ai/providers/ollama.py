@@ -14,8 +14,8 @@ try:
 except ImportError:
     JSON_REPAIR_AVAILABLE = False
 
-from commitpilot.ai.prompts import get_summarization_prompt, get_standup_prompt
-from commitpilot.core.utils import get_config_value
+from gitbrieflyly.ai.prompts import get_summarization_prompt, get_standup_prompt
+from gitbrieflyly.core.utils import get_config_value
 
 
 class OllamaProvider:
@@ -375,3 +375,6 @@ class OllamaProvider:
             "today": ["Continue pending work"],
             "blockers": ["None"],
         }
+
+
+

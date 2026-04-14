@@ -179,3 +179,6 @@ Needs improvement: {{"yesterday": ["Fixed bug #123", "Updated dependencies"], "t
 {STANDUP_PROMPT_SUFFIX}"""
 
     return prompt
+
+
+

@@ -1,17 +1,17 @@
-"""CLI entry point for commitpilot."""
+"""CLI entry point for gitbrieflyly."""
 
 import typer
 from typing import Optional
 
-from commitpilot.commands.today import today_command
-from commitpilot.commands.week import week_command
-from commitpilot.commands.standup import standup_command
-from commitpilot.commands.stats import stats_command
-from commitpilot.commands.history import history_command
-from commitpilot.commands.doctor import doctor_command
+from gitbrieflyly.commands.today import today_command
+from gitbrieflyly.commands.week import week_command
+from gitbrieflyly.commands.standup import standup_command
+from gitbrieflyly.commands.stats import stats_command
+from gitbrieflyly.commands.history import history_command
+from gitbrieflyly.commands.doctor import doctor_command
 
 app = typer.Typer(
-    name="commitpilot",
+    name="gitbrieflyly",
     help="Your daily developer standup - powered by your Git history",
     add_completion=False,
 )
@@ -148,12 +148,15 @@ def doctor(
 
 @app.command()
 def version():
-    """Show commitpilot version."""
-    from commitpilot import __version__
+    """Show gitbrieflyly version."""
+    from gitbrieflyly import __version__
 
-    print(f"commitpilot version {__version__}")
+    print(f"gitbrieflyly version {__version__}")
     raise typer.Exit(0)
 
 
 if __name__ == "__main__":
     app()
+
+
+

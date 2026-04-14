@@ -1,13 +1,13 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0,<67.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "commitpilot"
-version = "0.1.0"
+name = "gitbriefly"
+version = "0.1.1"
 description = "Your daily developer standup - powered by Git history"
-readme = "README.md"
 license = {text = "MIT"}
+readme = "README.md"
 authors = [
     {name = "Akshat190", email = "akshatchoksi8@gmail.com"}
 ]
@@ -44,16 +44,16 @@ anthropic = ["anthropic>=0.18.0"]
 openai = ["openai>=1.0.0"]
 
 [project.scripts]
-commitpilot = "commitpilot.cli:app"
+gitbriefly = "gitbriefly.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/Akshat190/commitpilot"
-Repository = "https://github.com/Akshat190/commitpilot"
-Issues = "https://github.com/Akshat190/commitpilot/issues"
+Homepage = "https://github.com/Akshat190/gitbriefly"
+Repository = "https://github.com/Akshat190/gitbriefly"
+Issues = "https://github.com/Akshat190/gitbriefly/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["commitpilot*"]
+include = ["gitbriefly*"]
 
 [tool.setuptools.package-data]
-commitpilot = ["*.json"]
+gitbriefly = ["*.json"]
