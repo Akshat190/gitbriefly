@@ -3,9 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List
 
-from gitbrieflyly.ai.providers.ollama import OllamaProvider
-from gitbrieflyly.ai.providers.openai import OpenAIProvider
-from gitbrieflyly.ai.providers.anthropic import AnthropicProvider
+from gitbriefly.ai.providers.ollama import OllamaProvider
+from gitbriefly.ai.providers.openai import OpenAIProvider
+from gitbriefly.ai.providers.anthropic import AnthropicProvider
 
 
 class BaseProvider(ABC):
@@ -44,7 +44,10 @@ def get_provider(provider: str, model: str = "llama3", **kwargs):
     return provider_class(model=model, check_connection=False, **kwargs)
 
 
-__all__ = ["BaseProvider", "get_provider", "OllamaProvider", "OpenAIProvider", "AnthropicProvider"]
-
-
-
+__all__ = [
+    "BaseProvider",
+    "get_provider",
+    "OllamaProvider",
+    "OpenAIProvider",
+    "AnthropicProvider",
+]

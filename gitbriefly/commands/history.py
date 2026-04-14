@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.table import Table
 from datetime import datetime
 
-from gitbrieflyly.core.memory import get_history
+from gitbriefly.core.memory import get_history
 
 console = Console()
 
@@ -43,7 +43,11 @@ def _display_history(history, days):
         yesterday = summary.get("yesterday", [])
         commits = len(yesterday) if yesterday else 0
 
-        date_str = datetime.fromisoformat(date).strftime("%Y-%m-%d %H:%M") if date else "Unknown"
+        date_str = (
+            datetime.fromisoformat(date).strftime("%Y-%m-%d %H:%M")
+            if date
+            else "Unknown"
+        )
 
         summary_text = ", ".join(yesterday[:2]) if yesterday else "No summary"
         if len(yesterday) > 2:
@@ -52,6 +56,3 @@ def _display_history(history, days):
         table.add_row(date_str, str(commits), summary_text)
 
     console.print(table)
-
-
-

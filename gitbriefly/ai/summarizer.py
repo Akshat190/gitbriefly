@@ -2,7 +2,7 @@
 
 from typing import Dict, List
 
-from gitbrieflyly.ai.providers import get_provider, BaseProvider
+from gitbriefly.ai.providers import get_provider, BaseProvider
 
 
 class Summarizer:
@@ -22,6 +22,3 @@ class Summarizer:
     def summarize_for_standup(self, commits: List[Dict]) -> Dict[str, List[str]]:
         """Generate standup summary."""
         return self.provider.summarize_for_standup(commits)
-
-
-

@@ -1,7 +1,5 @@
 """Tests for summarizer module."""
 
-import pytest
-
 from gitbriefly.ai.summarizer import Summarizer
 
 

@@ -61,7 +61,7 @@ def check_commits_in_range(path, days=7):
 
 def check_config_file():
     """Check if config file is valid."""
-    from gitbrieflyly.core.utils import load_config
+    from gitbriefly.core.utils import load_config
 
     config_path = Path.home() / ".gitbriefly.toml"
     if not config_path.exists():
@@ -104,7 +104,9 @@ def doctor_command(path: str = None):
     if ollama_running:
         model_names = [m.get("name", "") for m in models]
         console.print("  [green]✓[/green] Ollama is running")
-        console.print(f"  Available models: {', '.join(model_names) if model_names else 'None'}")
+        console.print(
+            f"  Available models: {', '.join(model_names) if model_names else 'None'}"
+        )
         results.append(("Ollama", "Running", "green"))
     else:
         console.print("  [red]✗[/red] Ollama is not running")
@@ -173,9 +175,8 @@ def doctor_command(path: str = None):
     if all_passed:
         console.print("\n[bold green]All checks passed! ✓[/bold green]\n")
     else:
-        console.print("\n[bold yellow]Some issues found. See suggestions above.[/bold yellow]\n")
+        console.print(
+            "\n[bold yellow]Some issues found. See suggestions above.[/bold yellow]\n"
+        )
 
     raise typer.Exit(0)
-
-
-

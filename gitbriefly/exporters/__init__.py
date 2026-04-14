@@ -3,8 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
-from gitbrieflyly.exporters.markdown import MarkdownExporter
-from gitbrieflyly.exporters.json import JSONExporter
+from gitbriefly.exporters.markdown import MarkdownExporter
+from gitbriefly.exporters.json import JSONExporter
 
 
 class BaseExporter(ABC):
@@ -33,6 +33,3 @@ def get_exporter(exporter: str, **kwargs):
 
 
 __all__ = ["BaseExporter", "get_exporter", "MarkdownExporter", "JSONExporter"]
-
-
-

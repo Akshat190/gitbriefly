@@ -8,7 +8,7 @@ from typing import Dict, List
 
 import requests
 
-from gitbrieflyly.core.utils import get_config_value
+from gitbriefly.core.utils import get_config_value
 
 
 class OpenAIProvider:
@@ -37,14 +37,19 @@ class OpenAIProvider:
     def complete(self, prompt: str) -> str:
         """Send prompt to OpenAI, return raw response."""
         url = "https://api.openai.com/v1/chat/completions"
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.7,
         }
 
-        response = requests.post(url, json=payload, headers=headers, timeout=self.timeout)
+        response = requests.post(
+            url, json=payload, headers=headers, timeout=self.timeout
+        )
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"]
 
@@ -60,7 +65,7 @@ class OpenAIProvider:
                 "next_steps": [],
             }
 
-        from gitbrieflyly.ai.prompts import get_summarization_prompt
+        from gitbriefly.ai.prompts import get_summarization_prompt
 
         prompt = get_summarization_prompt(commits)
         try:
@@ -81,7 +86,7 @@ class OpenAIProvider:
                 "blockers": ["OpenAI API key not set"],
             }
 
-        from gitbrieflyly.ai.prompts import get_standup_prompt
+        from gitbriefly.ai.prompts import get_standup_prompt
 
         prompt = get_standup_prompt(commits)
         try:
@@ -164,7 +169,9 @@ class OpenAIProvider:
 
         return result
 
-    def _fallback_summary(self, commits: List[Dict], error: str) -> Dict[str, List[str]]:
+    def _fallback_summary(
+        self, commits: List[Dict], error: str
+    ) -> Dict[str, List[str]]:
         """Fallback when OpenAI fails."""
         return {
             "yesterday": [c["message"] for c in commits[:5]],
@@ -172,13 +179,12 @@ class OpenAIProvider:
             "next_steps": ["Check OPENAI_API_KEY environment variable"],
         }
 
-    def _fallback_standup(self, commits: List[Dict], error: str) -> Dict[str, List[str]]:
+    def _fallback_standup(
+        self, commits: List[Dict], error: str
+    ) -> Dict[str, List[str]]:
         """Fallback standup."""
         return {
             "yesterday": [c["message"] for c in commits[:5]],
             "today": ["Continue working on pending tasks"],
             "blockers": [f"API error: {error}"],
         }
-
-
-

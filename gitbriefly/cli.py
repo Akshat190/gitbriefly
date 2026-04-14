@@ -1,17 +1,17 @@
-"""CLI entry point for gitbrieflyly."""
+"""CLI entry point for gitbriefly."""
 
 import typer
 from typing import Optional
 
-from gitbrieflyly.commands.today import today_command
-from gitbrieflyly.commands.week import week_command
-from gitbrieflyly.commands.standup import standup_command
-from gitbrieflyly.commands.stats import stats_command
-from gitbrieflyly.commands.history import history_command
-from gitbrieflyly.commands.doctor import doctor_command
+from gitbriefly.commands.today import today_command
+from gitbriefly.commands.week import week_command
+from gitbriefly.commands.standup import standup_command
+from gitbriefly.commands.stats import stats_command
+from gitbriefly.commands.history import history_command
+from gitbriefly.commands.doctor import doctor_command
 
 app = typer.Typer(
-    name="gitbrieflyly",
+    name="gitbriefly",
     help="Your daily developer standup - powered by your Git history",
     add_completion=False,
 )
@@ -28,7 +28,9 @@ def today(
     export: Optional[str] = None,
     since: Optional[str] = None,
     until: Optional[str] = None,
-    days_ago: Optional[int] = typer.Option(7, "--days-ago", help="Number of days to look back"),
+    days_ago: Optional[int] = typer.Option(
+        7, "--days-ago", help="Number of days to look back"
+    ),
     max_commits: int = 100,
     author: Optional[str] = None,
     branch: Optional[str] = None,
@@ -148,15 +150,12 @@ def doctor(
 
 @app.command()
 def version():
-    """Show gitbrieflyly version."""
-    from gitbrieflyly import __version__
+    """Show gitbriefly version."""
+    from gitbriefly import __version__
 
-    print(f"gitbrieflyly version {__version__}")
+    print(f"gitbriefly version {__version__}")
     raise typer.Exit(0)
 
 
 if __name__ == "__main__":
     app()
-
-
-
