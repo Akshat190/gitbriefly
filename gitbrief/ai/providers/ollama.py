@@ -3,9 +3,16 @@
 import json
 import re
 import sys
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import requests
+
+try:
+    from llm_json_repair import parse_json
+
+    JSON_REPAIR_AVAILABLE = True
+except ImportError:
+    JSON_REPAIR_AVAILABLE = False
 
 from gitbrief.ai.prompts import get_summarization_prompt, get_standup_prompt
 from gitbrief.core.utils import get_config_value
@@ -105,7 +112,8 @@ class OllamaProvider:
         prompt = get_summarization_prompt(commits)
         try:
             response = self.complete(prompt)
-            return self._parse_response(response)
+            result = self._parse_response(response)
+            return self._clean_output(result)
         except Exception as e:
             return self._fallback_summary(commits, str(e))
 
@@ -117,16 +125,60 @@ class OllamaProvider:
         prompt = get_standup_prompt(commits)
         try:
             response = self.complete(prompt)
-            return self._parse_standup_response(response)
+            result = self._parse_standup_response(response)
+            return self._clean_output(result)
         except Exception as e:
             return self._fallback_standup(commits, str(e))
 
+    def _clean_output(self, result: Dict[str, List[str]]) -> Dict[str, List[str]]:
+        """Clean and validate output."""
+        if not result:
+            return result
+
+        cleaned = {}
+        for key, items in result.items():
+            if not isinstance(items, list):
+                items = []
+
+            seen = set()
+            clean_items = []
+            for item in items:
+                if not item or not isinstance(item, str):
+                    continue
+                item = item.strip()
+                if len(item) < 3:
+                    continue
+                item_lower = item.lower()
+                if item_lower in seen:
+                    continue
+                if len(item) > 50:
+                    item = item[:47] + "..."
+                clean_items.append(item)
+                seen.add(item_lower)
+
+            cleaned[key] = clean_items[:5]
+
+        if not cleaned.get("yesterday"):
+            cleaned["yesterday"] = ["No activity detected"]
+
+        return cleaned
+
     def _parse_response(self, response: str) -> Dict[str, List[str]]:
-        """Parse LLM JSON response."""
-        match = re.search(r"\{.*\}", response, re.DOTALL)
-        if match:
+        """Parse LLM JSON response with repair."""
+        if JSON_REPAIR_AVAILABLE:
+            result = parse_json(response, strict=False)
+            if result.data:
+                data = result.data
+                return {
+                    "yesterday": data.get("yesterday", []),
+                    "risks": data.get("risks", []),
+                    "next_steps": data.get("next_steps", []),
+                }
+
+        cleaned = self._extract_json(response)
+        if cleaned:
             try:
-                parsed = json.loads(match.group())
+                parsed = json.loads(cleaned)
                 return {
                     "yesterday": parsed.get("yesterday", []),
                     "risks": parsed.get("risks", []),
@@ -135,35 +187,61 @@ class OllamaProvider:
             except json.JSONDecodeError:
                 pass
 
+        return self._text_parse(response)
+
+    def _extract_json(self, text: str) -> Optional[str]:
+        """Extract JSON from text."""
+        patterns = [
+            r"```json\s*(\{.*?\})\s*```",
+            r"```\s*(\{.*?\})\s*```",
+            r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, text, re.DOTALL)
+            if match:
+                return match.group(1) if match.group(1) else match.group()
+        return None
+
+    def _text_parse(self, response: str) -> Dict[str, List[str]]:
+        """Parse text response."""
         result = {"yesterday": [], "risks": [], "next_steps": []}
-        current_section = None
+        current = None
         for line in response.split("\n"):
             line = line.strip()
             if not line:
                 continue
-            line_lower = line.lower()
-            if "yesterday" in line_lower or "summary" in line_lower:
-                current_section = "yesterday"
-            elif "risk" in line_lower or "unfinished" in line_lower:
-                current_section = "risks"
-            elif "next" in line_lower or "suggest" in line_lower:
-                current_section = "next_steps"
+            lower = line.lower()
+            if "yesterday" in lower or "completed" in lower:
+                current = "yesterday"
+            elif "risk" in lower or "blocker" in lower or "unfinished" in lower:
+                current = "risks"
+            elif "next" in lower or "today" in lower or "plan" in lower:
+                current = "next_steps"
             elif line.startswith("•") or line.startswith("-") or line.startswith("*"):
-                if current_section and current_section in result:
-                    clean_line = line.lstrip("•*-").strip()
-                    if clean_line:
-                        result[current_section].append(clean_line)
-            elif current_section and line:
-                result[current_section].append(line)
-
+                if current and current in result:
+                    clean = line.lstrip("•*-").strip()
+                    if clean and len(clean) > 2:
+                        result[current].append(clean)
+            elif current and line and len(line) > 2:
+                result[current].append(line)
         return result if any(result.values()) else self._simple_parse(response)
 
     def _parse_standup_response(self, response: str) -> Dict[str, List[str]]:
-        """Parse standup response."""
-        match = re.search(r"\{.*\}", response, re.DOTALL)
-        if match:
+        """Parse standup response with repair."""
+        if JSON_REPAIR_AVAILABLE:
+            result = parse_json(response, strict=False)
+            if result.data:
+                data = result.data
+                return {
+                    "yesterday": data.get("yesterday", []),
+                    "today": data.get("today", []),
+                    "blockers": data.get("blockers", []),
+                }
+
+        cleaned = self._extract_json(response)
+        if cleaned:
             try:
-                parsed = json.loads(match.group())
+                parsed = json.loads(cleaned)
                 return {
                     "yesterday": parsed.get("yesterday", []),
                     "today": parsed.get("today", []),
@@ -172,27 +250,45 @@ class OllamaProvider:
             except json.JSONDecodeError:
                 pass
 
+        return self._text_parse_standup(response)
+
+    def _text_parse_standup(self, response: str) -> Dict[str, List[str]]:
+        """Parse standup text."""
         result = {"yesterday": [], "today": [], "blockers": []}
-        current_section = None
+        current = None
         for line in response.split("\n"):
             line = line.strip()
             if not line:
                 continue
-            line_lower = line.lower()
-            if "yesterday" in line_lower:
-                current_section = "yesterday"
-            elif "today" in line_lower:
-                current_section = "today"
-            elif "blocker" in line_lower:
-                current_section = "blockers"
+            lower = line.lower()
+            if "yesterday" in lower or "completed" in lower:
+                current = "yesterday"
+            elif "today" in lower or "working" in lower or "plan" in lower:
+                current = "today"
+            elif "blocker" in lower or "stuck" in lower:
+                current = "blockers"
             elif line.startswith("•") or line.startswith("-") or line.startswith("*"):
-                if current_section and current_section in result:
-                    clean_line = line.lstrip("•*-").strip()
-                    if clean_line:
-                        result[current_section].append(clean_line)
-            elif current_section and line:
-                result[current_section].append(line)
+                if current and current in result:
+                    clean = line.lstrip("•*-").strip()
+                    if clean and len(clean) > 2:
+                        result[current].append(clean)
+            elif current and line and len(line) > 2:
+                result[current].append(line)
+        return result if any(result.values()) else self._simple_standup_parse(response)
 
+    def _simple_standup_parse(self, response: str) -> Dict[str, List[str]]:
+        """Simple standup fallback."""
+        result = {"yesterday": [], "today": [], "blockers": []}
+        for section in response.split("\n\n"):
+            lines = [line.strip() for line in section.split("\n") if line.strip()]
+            if not lines:
+                continue
+            if "yesterday" in lines[0].lower():
+                result["yesterday"] = lines[1:]
+            elif "today" in lines[0].lower():
+                result["today"] = lines[1:]
+            elif "blocker" in lines[0].lower():
+                result["blockers"] = lines[1:]
         return result
 
     def _simple_parse(self, response: str) -> Dict[str, List[str]]:
@@ -211,30 +307,34 @@ class OllamaProvider:
         return result
 
     def _fallback_summary(self, commits: List[Dict], error: str) -> Dict[str, List[str]]:
-        """Fallback when Ollama is unavailable."""
-        print(
-            "[yellow]Warning: AI response parsing failed - showing basic summary[/yellow]",
-            file=sys.stderr,
-        )
+        """Fallback when AI fails - create meaningful summary from commits."""
+        print("[yellow]Note: Showing commit summary[/yellow]", file=sys.stderr)
+
         repo_groups = {}
-        for commit in commits:
+        for commit in commits[:10]:
             repo = commit.get("repo", "unknown")
             if repo not in repo_groups:
                 repo_groups[repo] = []
-            repo_groups[repo].append(commit["message"])
+            msg = commit.get("message", "")[:40]
+            repo_groups[repo].append(msg)
 
         result = {"yesterday": [], "risks": [], "next_steps": []}
         for repo, messages in repo_groups.items():
-            result["yesterday"].append(f"[{repo}] {len(messages)} commits")
+            if messages:
+                result["yesterday"].append(f"{repo}: {len(messages)} changes")
 
-        result["risks"].append("AI analysis unavailable - showing basic commit list")
-        result["next_steps"].append("Run: gitbrief doctor")
+        if len(commits) > 10:
+            result["next_steps"].append(f"+ {len(commits) - 10} more commits")
+
         return result
 
     def _fallback_standup(self, commits: List[Dict], error: str) -> Dict[str, List[str]]:
         """Fallback standup."""
+        items = [c.get("message", "")[:40] for c in commits[:3]]
+        if not items:
+            items = ["No commits"]
         return {
-            "yesterday": [c["message"] for c in commits[:5]],
-            "today": ["Continue working on pending tasks"],
+            "yesterday": items,
+            "today": ["Continue pending work"],
             "blockers": ["None"],
         }

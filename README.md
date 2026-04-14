@@ -69,7 +69,7 @@ ollama pull llama3
 ## 🧪 Usage
 
 ```bash
-# Today's summary (last 24 hours)
+# Today's summary (last 7 days)
 gitbrief today
 
 # Weekly summary (last 7 days)
@@ -77,6 +77,9 @@ gitbrief week
 
 # Generate standup message (viral feature!)
 gitbrief standup
+
+# Diagnose issues
+gitbrief doctor
 
 # Commit statistics
 gitbrief stats
@@ -100,6 +103,12 @@ gitbrief today --branch main
 
 # Custom date range
 gitbrief today --since 2024-01-01 --until 2024-01-07
+
+# Days to look back (default: 7)
+gitbrief today --days-ago 14
+
+# Limit commits processed
+gitbrief today --max-commits 50
 
 # Use different AI model
 gitbrief today --model mistral
@@ -134,6 +143,7 @@ Create `~/.gitbrief.toml` to set defaults:
 path = "/path/to/repos"
 model = "llama3"
 provider = "ollama"
+timeout = 120
 ```
 
 ---
@@ -143,14 +153,16 @@ provider = "ollama"
 | Option | Alias | Description | Default |
 |--------|-------|-------------|---------|
 | `--path` | `-p` | Path to Git repo or directory | `.` |
-| `--model` | `-m` | AI model to use | `llama3` |
+| `--model` | `-m` | AI model to use | auto-detect |
 | `--provider` | - | AI provider: `ollama`, `openai`, `anthropic` | `ollama` |
+| `--days-ago` | - | Days to look back | `7` |
+| `--max-commits` | - | Max commits to process | `100` |
 | `--no-ai` | - | Skip AI, show raw commits | `false` |
 | `--json` | `-j` | Output as JSON | `false` |
 | `--stream` | - | Stream AI response (Ollama) | `false` |
 | `--export` | `-e` | Export to file | - |
-| `--since` | - | Start date (ISO or days) | - |
-| `--until` | - | End date (ISO) | - |
+| `--since` | - | Start date (ISO format) | - |
+| `--until` | - | End date (ISO format) | - |
 | `--author` | - | Filter by author | - |
 | `--branch` | `-b` | Filter by branch | - |
 
@@ -159,12 +171,13 @@ provider = "ollama"
 ## 🗂️ Commands
 
 | Command | Description |
-|--------|-------------|
-| `today` | Last 24 hours summary |
-| `week` | Last 7 days summary |
-| `standup` | Yesterday/Today/Blockers |
+|---------|-------------|
+| `today` | Daily summary (last 7 days, for standups) |
+| `week` | Weekly summary (last 7 days) |
+| `standup` | Yesterday/Today/Blockers format |
 | `stats` | Commit statistics |
 | `history` | Past summaries |
+| `doctor` | Diagnose issues & check setup |
 | `version` | Show version |
 
 ---

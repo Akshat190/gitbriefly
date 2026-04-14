@@ -3,20 +3,45 @@
 from typing import Dict, List
 
 
+QUALITY_CHECK = """
+STRICT RULES (you MUST follow):
+- Output MUST contain only information from the provided commits
+- Do NOT add items that aren't supported by the commits
+- If no meaningful risks exist, use empty array []
+- Each item MUST be under 50 characters
+- Include at least 2 items in "yesterday" if commits exist
+- NEVER include raw commit messages verbatim - summarize them
+- Be concise - max 5 items per section
+- Group similar items together"""
+
+
 JSON_PROMPT_SUFFIX = """
 
-IMPORTANT: Respond ONLY with a JSON object. No markdown. No preamble. Use this exact format:
-{"yesterday": ["item 1", "item 2"], "risks": ["item 1"], "next_steps": ["item 1"]}
+RESPONSE FORMAT (REQUIRED):
+You MUST respond with ONLY valid JSON. No markdown, no code blocks, no explanation.
 
-Do not include any other text in your response."""
+JSON Schema:
+{"yesterday": ["completed work"], "risks": ["issues"], "next_steps": ["actions"]}
+
+Rules:
+- All fields are required arrays
+- Each string under 50 characters
+- Empty arrays [] allowed
+- No extra fields"""
 
 
 STANDUP_PROMPT_SUFFIX = """
 
-IMPORTANT: Respond ONLY with a JSON object. No markdown. No preamble. Use this exact format:
-{"yesterday": ["item 1", "item 2"], "today": ["item 1"], "blockers": ["item 1"]}
+RESPONSE FORMAT (REQUIRED):
+You MUST respond with ONLY valid JSON. No markdown, no code blocks, no explanation.
 
-Do not include any other text in your response."""
+JSON Schema:
+{"yesterday": ["completed"], "today": ["planned"], "blockers": ["issues"]}
+
+Rules:
+- All fields are required arrays
+- Each string under 50 characters
+- Empty arrays [] allowed"""
 
 
 def get_summarization_prompt(commits: List[Dict]) -> str:
@@ -26,37 +51,24 @@ def get_summarization_prompt(commits: List[Dict]) -> str:
     for commit in commits:
         files_info = ""
         if commit.get("files"):
-            files_info = f" (files: {', '.join(commit['files'][:5])}"
-            if len(commit["files"]) > 5:
-                files_info += f", +{len(commit['files']) - 5} more"
-            files_info += ")"
+            files_info = f" ({', '.join(commit['files'][:3])})"
+        commit_summary.append(f"- {commit['message']}{files_info}")
 
-        commit_summary.append(f"- [{commit['repo']}] {commit['message']}{files_info}")
+    commits_text = "\n".join(commit_summary[:15])
 
-    commits_text = "\n".join(commit_summary)
+    prompt = f"""You are a developer assistant that summarizes Git commits.
 
-    prompt = f"""You are a developer assistant that summarizes Git activity into a daily briefing.
-
-Analyze the following commits from the last 24 hours and create a structured summary.
+TASK: Create a concise daily briefing from these commits.
 
 Commits:
 {commits_text}
 
-Generate a briefing with these three sections:
+{QUALITY_CHECK}
 
-## Yesterday
-List the main work done. Group by theme/project. Use bullet points.
+Output this JSON (no other text):
+{{"yesterday": ["summarized item 1", "summarized item 2"], "risks": ["risk if any"], "next_steps": ["next action"]}}
 
-## Risks  
-Identify potential issues:
-- Unfinished work (WIP commits, "todo" in messages)
-- Risky changes (large refactors, security-related)
-- Missing tests or error handling
-
-## Next Steps
-Suggest logical next actions based on the commits.
-
-Be concise and actionable.{JSON_PROMPT_SUFFIX}"""
+Example: {{"yesterday": ["Added user auth", "Fixed login bug"], "risks": [], "next_steps": ["Add logout"]}}{JSON_PROMPT_SUFFIX}"""
 
     return prompt
 
@@ -73,75 +85,47 @@ def get_week_summarization_prompt(commits: List[Dict]) -> str:
 
     daily_summaries = []
     for day, day_commits in sorted(by_day.items()):
-        repo_groups = {}
-        for c in day_commits:
-            repo = c.get("repo", "unknown")
-            if repo not in repo_groups:
-                repo_groups[repo] = []
-            repo_groups[repo].append(c["message"])
-
-        summary = f"{day}:\n"
-        for repo, msgs in repo_groups.items():
-            summary += f"  [{repo}]: {len(msgs)} commits\n"
-
-        daily_summaries.append(summary)
+        msgs = [c["message"] for c in day_commits]
+        daily_summaries.append(f"{day}: {len(msgs)} commits")
 
     commits_text = "\n".join(daily_summaries)
 
-    prompt = f"""You are a developer assistant that summarizes Git activity into a weekly briefing.
+    prompt = f"""You are a developer assistant that summarizes Git commits.
 
-Analyze the following commits from the last 7 days.
+TASK: Create a weekly summary from these commits.
 
 Commits by day:
 {commits_text}
 
-Generate a weekly briefing with:
+{QUALITY_CHECK}
 
-## 🧠 Week Summary
-What was accomplished each day. Group by project.
-
-## ⚠️ Risks
-Potential issues or unfinished work.
-
-## 🎯 This Week's Goals
-What should be focused on next week.
-
-Be concise."""
+Output this JSON:
+{{"yesterday": ["week summary"], "risks": ["issues"], "next_steps": ["next week goals"]}}{JSON_PROMPT_SUFFIX}"""
 
     return prompt
 
 
 def get_standup_prompt(commits: List[Dict]) -> str:
-    """Generate prompt for standup message (Yesterday / Today / Blockers)."""
+    """Generate prompt for standup message."""
 
     commit_summary = []
     for commit in commits[:10]:
-        files_info = ""
-        if commit.get("files"):
-            files_info = f" ({', '.join(commit['files'][:3])})"
-
-        commit_summary.append(f"- {commit['message']}{files_info}")
+        commit_summary.append(f"- {commit['message']}")
 
     commits_text = "\n".join(commit_summary)
 
-    prompt = f"""You are a developer preparing a daily standup update.
+    prompt = f"""You are a developer preparing a daily standup.
 
-Based on these commits from yesterday:
+TASK: Convert these commits into a standup message.
+
+Commits:
 {commits_text}
 
-Generate a standup message in this exact format:
+{QUALITY_CHECK}
 
-## Yesterday
-- [What you completed]
+Output this JSON:
+{{"yesterday": ["completed work"], "today": ["planned work"], "blockers": ["issues if any"]}}
 
-## Today
-- [What you plan to work on]
-
-## Blockers
-- [Any blockers or challenges]
-
-For "Today", infer logical next steps from the commits.
-For "Blockers", identify any risks or unfinished work.
-Be concise - 3-5 items per section max.{STANDUP_PROMPT_SUFFIX}"""
+Example: {{"yesterday": ["Fixed auth bug", "Added login"], "today": ["Work on dashboard"], "blockers": []}}{STANDUP_PROMPT_SUFFIX}"""
 
     return prompt
