@@ -28,7 +28,7 @@ jobs:
           pip install pytest ruff
 
       - name: Lint with ruff
-        run: ruff check gitbrief/
+        run: ruff check gitbriefly/
 
       - name: Run tests
         run: pytest
@@ -73,4 +73,4 @@ jobs:
         run: pip install ruff
 
       - name: Run ruff
-        run: ruff check gitbrief/
+        run: ruff check gitbriefly/
