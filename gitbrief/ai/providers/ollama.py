@@ -133,9 +133,13 @@ class OllamaProvider:
     def _clean_output(self, result: Dict[str, List[str]]) -> Dict[str, List[str]]:
         """Clean and validate output."""
         if not result:
-            return result
+            # Return appropriate empty structure based on what keys we expect
+            # Since we don't know the context here, return a generic structure
+            # The calling functions should handle context-specific defaults
+            return {"yesterday": [], "risks": [], "next_steps": []}
 
         cleaned = {}
+        # Process whatever keys are present in the result
         for key, items in result.items():
             if not isinstance(items, list):
                 items = []
@@ -146,20 +150,53 @@ class OllamaProvider:
                 if not item or not isinstance(item, str):
                     continue
                 item = item.strip()
-                if len(item) < 3:
+                # Allow items with at least 1 character (more lenient than original 3)
+                if len(item) < 1:
                     continue
                 item_lower = item.lower()
                 if item_lower in seen:
                     continue
+                # Still enforce 50 character limit
                 if len(item) > 50:
                     item = item[:47] + "..."
                 clean_items.append(item)
                 seen.add(item_lower)
 
-            cleaned[key] = clean_items[:5]
+            cleaned[key] = clean_items[:5]  # Still limit to 5 items per section
 
-        if not cleaned.get("yesterday"):
-            cleaned["yesterday"] = ["No activity detected"]
+        # Ensure required keys exist with appropriate defaults
+        # For summarization: yesterday, risks, next_steps
+        # For standup: yesterday, today, blockers
+        expected_summarization_keys = {"yesterday", "risks", "next_steps"}
+        expected_standup_keys = {"yesterday", "today", "blockers"}
+
+        # Determine context based on which keys are present in original result
+        result_keys = set(result.keys())
+        if expected_summarization_keys.issubset(result_keys) or (
+            len(result_keys & expected_summarization_keys) >= 2
+            and len(result_keys & expected_standup_keys) < 2
+        ):
+            # Looks like summarization context
+            for key in expected_summarization_keys:
+                if key not in cleaned:
+                    cleaned[key] = []
+            # Only set default for yesterday if it's empty and we're doing summarization
+            if not cleaned.get("yesterday"):
+                cleaned["yesterday"] = ["No activity detected"]
+        elif expected_standup_keys.issubset(result_keys) or (
+            len(result_keys & expected_standup_keys) >= 2
+            and len(result_keys & expected_summarization_keys) < 2
+        ):
+            # Looks like standup context
+            for key in expected_standup_keys:
+                if key not in cleaned:
+                    cleaned[key] = []
+            # For standup, we don't set a default message - let it be empty if appropriate
+        else:
+            # Unknown context, ensure basics exist
+            for key in ["yesterday", "risks", "next_steps"]:
+                if key not in cleaned:
+                    cleaned[key] = []
 
         return cleaned
 
