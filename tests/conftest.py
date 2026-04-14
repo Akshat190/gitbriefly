@@ -1,4 +1,4 @@
-"""Test fixtures for gitbrief tests."""
+"""Test fixtures for gitbriefly tests."""
 
 import gc
 import os
