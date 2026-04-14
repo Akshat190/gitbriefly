@@ -1,7 +1,5 @@
 """Tests for git_reader module."""
 
-import pytest
-
 from gitbriefly.core.git_reader import GitReader
 
 

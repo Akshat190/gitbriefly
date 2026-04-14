@@ -5,8 +5,8 @@ from rich.console import Console
 from rich.table import Table
 from typing import Optional
 
-from gitbrieflyly.core.git_reader import GitReader
-from gitbrieflyly.core.utils import load_config, get_config_value
+from gitbriefly.core.git_reader import GitReader
+from gitbriefly.core.utils import load_config, get_config_value
 
 console = Console()
 config = load_config()
@@ -85,6 +85,3 @@ def _display_stats(commits, days):
         console.print("\n[bold]Most Changed Files:[/bold]")
         for filename, count in top_files:
             console.print(f"  {filename}: {count} changes")
-
-
-

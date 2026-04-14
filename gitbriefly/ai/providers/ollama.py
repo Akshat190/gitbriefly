@@ -14,8 +14,8 @@ try:
 except ImportError:
     JSON_REPAIR_AVAILABLE = False
 
-from gitbrieflyly.ai.prompts import get_summarization_prompt, get_standup_prompt
-from gitbrieflyly.core.utils import get_config_value
+from gitbriefly.ai.prompts import get_summarization_prompt, get_standup_prompt
+from gitbriefly.core.utils import get_config_value
 
 
 class OllamaProvider:
@@ -43,7 +43,8 @@ class OllamaProvider:
             response = requests.get(f"{self.base_url}/api/tags", timeout=2)
             if response.status_code != 200:
                 print(
-                    "[yellow]Warning: Ollama may not be running properly[/yellow]", file=sys.stderr
+                    "[yellow]Warning: Ollama may not be running properly[/yellow]",
+                    file=sys.stderr,
                 )
         except Exception:
             print("[red]Error: Cannot connect to Ollama[/red]", file=sys.stderr)
@@ -57,20 +58,31 @@ class OllamaProvider:
             models = response.json().get("models", [])
             available = [m.get("name", "") for m in models]
             if self.model not in available:
-                print(f"[yellow]Warning: Model '{self.model}' not found[/yellow]", file=sys.stderr)
+                print(
+                    f"[yellow]Warning: Model '{self.model}' not found[/yellow]",
+                    file=sys.stderr,
+                )
                 print(
                     f"Available models: {', '.join(available) if available else 'None'}",
                     file=sys.stderr,
                 )
                 if available:
-                    print(f"[dim]Using first available: {available[0]}[/dim]", file=sys.stderr)
+                    print(
+                        f"[dim]Using first available: {available[0]}[/dim]",
+                        file=sys.stderr,
+                    )
                     self.model = available[0]
                 else:
-                    raise RuntimeError("No models available. Pull one with: ollama pull <model>")
+                    raise RuntimeError(
+                        "No models available. Pull one with: ollama pull <model>"
+                    )
         except RuntimeError:
             raise
         except Exception as e:
-            print(f"[yellow]Warning: Could not verify model: {e}[/yellow]", file=sys.stderr)
+            print(
+                f"[yellow]Warning: Could not verify model: {e}[/yellow]",
+                file=sys.stderr,
+            )
 
     @property
     def name(self) -> str:
@@ -82,7 +94,9 @@ class OllamaProvider:
         payload = {"model": self.model, "prompt": prompt, "stream": self.stream}
 
         if self.stream:
-            response = requests.post(url, json=payload, timeout=self.timeout + 30, stream=True)
+            response = requests.post(
+                url, json=payload, timeout=self.timeout + 30, stream=True
+            )
             response.raise_for_status()
             full_response = ""
             for chunk in response.iter_lines():
@@ -343,7 +357,9 @@ class OllamaProvider:
                 result["next_steps"] = lines[1:]
         return result
 
-    def _fallback_summary(self, commits: List[Dict], error: str) -> Dict[str, List[str]]:
+    def _fallback_summary(
+        self, commits: List[Dict], error: str
+    ) -> Dict[str, List[str]]:
         """Fallback when AI fails - create meaningful summary from commits."""
         print("[yellow]Note: Showing commit summary[/yellow]", file=sys.stderr)
 
@@ -365,7 +381,9 @@ class OllamaProvider:
 
         return result
 
-    def _fallback_standup(self, commits: List[Dict], error: str) -> Dict[str, List[str]]:
+    def _fallback_standup(
+        self, commits: List[Dict], error: str
+    ) -> Dict[str, List[str]]:
         """Fallback standup."""
         items = [c.get("message", "")[:40] for c in commits[:3]]
         if not items:
@@ -375,6 +393,3 @@ class OllamaProvider:
             "today": ["Continue pending work"],
             "blockers": ["None"],
         }
-
-
-
