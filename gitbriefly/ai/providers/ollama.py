@@ -170,13 +170,13 @@ class OllamaProvider:
                 item_lower = item.lower()
                 if item_lower in seen:
                     continue
-                # Still enforce 50 character limit
-                if len(item) > 50:
-                    item = item[:47] + "..."
+                # No character limit - show full messages
+                # if len(item) > 50:
+                #     item = item[:47] + "..."
                 clean_items.append(item)
                 seen.add(item_lower)
 
-            cleaned[key] = clean_items[:5]  # Still limit to 5 items per section
+            cleaned[key] = clean_items  # No limit on items per section
 
         # Ensure required keys exist with appropriate defaults
         # For summarization: yesterday, risks, next_steps

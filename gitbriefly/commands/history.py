@@ -32,9 +32,9 @@ def history_command(
 def _display_history(history, days):
     """Display history table."""
     table = Table(title=f"Git Brief History (Last {days} days)", show_header=True)
-    table.add_column("Date", style="cyan")
-    table.add_column("Commits", style="green", justify="right")
-    table.add_column("Summary", style="white")
+    table.add_column("Date", style="cyan", width=16)
+    table.add_column("Commits", style="green", justify="right", width=8)
+    table.add_column("Summary", style="white", no_wrap=False)
 
     for entry in history:
         date = entry.get("date", "")
@@ -49,9 +49,7 @@ def _display_history(history, days):
             else "Unknown"
         )
 
-        summary_text = ", ".join(yesterday[:2]) if yesterday else "No summary"
-        if len(yesterday) > 2:
-            summary_text += "..."
+        summary_text = ", ".join(yesterday) if yesterday else "No summary"
 
         table.add_row(date_str, str(commits), summary_text)
 

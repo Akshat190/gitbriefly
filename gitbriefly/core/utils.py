@@ -24,7 +24,9 @@ def load_config() -> dict:
             return {}
         except Exception as e:
             print(f"[yellow]Warning: Config file error: {e}[/yellow]", file=sys.stderr)
-            print("[dim]Check ~/.gitbriefly.toml for syntax errors[/dim]", file=sys.stderr)
+            print(
+                "[dim]Check ~/.gitbriefly.toml for syntax errors[/dim]", file=sys.stderr
+            )
             return {}
     return {}
 
@@ -47,13 +49,6 @@ def format_date(date: datetime) -> str:
     return date.strftime("%Y-%m-%d %H:%M")
 
 
-def truncate(text: str, max_length: int = 50) -> str:
-    """Truncate text to max length."""
-    if len(text) <= max_length:
-        return text
-    return text[: max_length - 3] + "..."
-
-
 def group_by_repo(commits: list) -> dict:
     """Group commits by repository."""
     result = {}
@@ -63,6 +58,3 @@ def group_by_repo(commits: list) -> dict:
             result[repo] = []
         result[repo].append(commit)
     return result
-
-
-
