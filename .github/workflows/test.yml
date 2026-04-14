@@ -56,7 +56,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install dist/*.whl
-          python -m gitbrief.cli --help
+          python -m gitbriefly.cli --help
 
   lint:
     runs-on: ubuntu-latest
